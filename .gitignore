@@ -1,0 +1,7 @@
+*~
+*.swp
+
+/*.gem
+/*.tar
+/_archive
+/_tmp
