@@ -40,7 +40,7 @@ end
 []: {{{1
 
   [1] Newt (and whiptail)
-  --- http://en.wikipedia.org/wiki/Newt\_(programming\_library)
+  --- http://en.wikipedia.org/wiki/Newt_(programming_library)
 
   [2] GNU General Public License, version 2
   --- http://www.opensource.org/licenses/GPL-2.0
