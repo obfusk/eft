@@ -66,13 +66,10 @@ module Eft
 
   class Cfg                                                     # {{{1
     def initialize(cfg = {}, &b)
-      @cfg = cfg; b[self] if b
-    end
-    def config
-      @cfg.freeze
+      @cfg = cfg; b[self] if b; @cfg.freeze
     end
     def call(k, *a)
-      self[k][*a] if self[k]
+      @cfg[k][*a] if @cfg[k]
     end
   end                                                           # }}}1
 
@@ -93,9 +90,21 @@ module Eft
   class CfgAskPass    < Cfg; include CfgEsc, CfgOK, CfgCancel ; end
   class CfgAskYesNo   < Cfg; include CfgEsc, CfgYes, CfgNo    ; end
   class CfgCheck      < Cfg; include CfgEsc, CfgOK, CfgCancel ; end
-  class CfgMenu       < Cfg; include CfgEsc, CfgOK, CfgCancel ; end
   class CfgRadio      < Cfg; include CfgEsc, CfgOK, CfgCancel ; end
   class CfgGauge      < Cfg                                   ; end
+
+  # --
+
+  class CfgMenu < Cfg                                           # {{{1
+    include CfgEsc, CfgOK, CfgCancel
+    def initialize(*a, &b)
+      @menu = []; super; @menu.freeze
+    end
+    def on(tag, item, &b)
+      @menu << { tag: tag, item: item, block: b }
+    end
+    def _menu; @menu end
+  end                                                           # }}}1
 
   # --
 
@@ -123,13 +132,17 @@ module Eft
   # ask for input w/ OK/Cancel buttons (and default)
   def self.ask(text, opts = {}, &b)
     c = CfgAsk.new(&b); a = opts[:default] ? [opts[:default]] : []
-    _whip(:ask, text, c, opts, a) { c.call :on_ok }
+    _whip(:ask, text, c, opts, a) do |lines|
+      c.call :on_ok, lines.first
+    end
   end
 
   # ask for password w/ OK/Cancel buttons
   def self.ask_pass(text, opts = {}, &b)
     c = CfgAskPass.new(&b)
-    _whip(:ask_pass, text, c, opts) { c.call :on_ok }
+    _whip(:ask_pass, text, c, opts) do |lines|
+      c.call :on_ok, lines.first
+    end
   end
 
   # ask w/ Yes/No buttons
@@ -141,20 +154,26 @@ module Eft
   # --
 
   # choose checkboxes
-  def self.check(opts = {}, &b)
+  def self.check(text, opts = {}, &b)
     :TODO
   end
   # --checklist text height width list-height [ tag item status ] ...
   # --separate-output
 
-  # choose from menu
-  def self.menu(opts = {}, &b)
-    :TODO
-  end
-  # --menu text height width menu-height [ tag item ] ...
+  # choose from menu w/ OK/Cancel buttons
+  def self.menu(text, opts = {}, &b)                            # {{{1
+    c = CfgMenu.new(&b); m = c._menu
+    o = opts.merge(subheight: opts[:menu_height]).freeze
+    a = m.map { |x| [x[:tag],x[:item]] } .flatten
+    t = Hash[m.map { |x| [x[:tag],x] }]
+    _whip(:menu, text, c, o, a) do |lines|
+      tag = lines.first; t[tag][:block][tag]
+    end
+  end                                                           # }}}1
+  # --noitem
 
   # choose radiobox
-  def self.radio(opts = {}, &b)
+  def self.radio(text, opts = {}, &b)
     :TODO
   end
   # --radiolist text height width list-height [ tag item status ] ...

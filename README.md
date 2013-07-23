@@ -11,14 +11,20 @@
 
 ## TODO
 
-  * build!
+  * finish!
 
 ## Description
 []: {{{1
 
   eft - ruby + whiptail
 
+  Eft is a ruby dsl that wraps whiptail [1] to display dialog boxes;
+  see example.rb for usage examples.
+
 ```ruby
+Eft.ask('What is your name?') do |q|
+  q.on_ok { |name| puts "Hello, #{name}!" }
+end
 ```
 
 []: }}}1
@@ -26,14 +32,17 @@
 ## License
 []: {{{1
 
-  GPLv2 [1].
+  GPLv2 [2].
 
 []: }}}1
 
 ## References
 []: {{{1
 
-  [1] GNU General Public License, version 2
+  [1] Newt (and whiptail)
+  --- http://en.wikipedia.org/wiki/Newt\_(programming\_library)
+
+  [2] GNU General Public License, version 2
   --- http://www.opensource.org/licenses/GPL-2.0
 
 []: }}}1
