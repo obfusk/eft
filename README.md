@@ -5,13 +5,9 @@
     Date        : 2013-07-23
 
     Copyright   : Copyright (C) 2013  Felix C. Stegerman
-    Version     : v0.0.1.dev
+    Version     : v0.2.0.dev
 
 []: }}}1
-
-## TODO
-
-  * finish!
 
 ## Description
 []: {{{1
@@ -28,6 +24,12 @@ end
 ```
 
 []: }}}1
+
+## TODO
+
+  * --noitem?
+  * choose between whiptail and dialog?
+  * extend w/ dialog's other dialogs?
 
 ## License
 []: {{{1

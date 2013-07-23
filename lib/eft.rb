@@ -20,16 +20,25 @@ module Eft
 
   # --
 
-  WHIPTAIL = 'whiptail'
+  # NB: dialog works as well as whiptail, but these options will be
+  # incompatible: --*-button (is: --*-label), --scrolltext
 
-  EXIT = { ok_yes: 0, cancel_no: 1, esc: 255 }
+  WHIPTAIL    = 'whiptail'
+  EXIT        = { ok_yes: 0, cancel_no: 1, esc: 255 }
+  CHECK_OPTS  = ['--separate-output']
+
+  OPT         = ->(o,x) { o.select { |k,v| OPTS[x][k] }
+                              .map { |k,v| OPTS[x][k][v] } }
+  ON_OFF      = ->(x) { x ? 'on' : 'off' }
+
+  # --
 
   WHAT = {                                                      # {{{1
-    show_info:  '--infobox'     , show_msg:   '--msgbox'  ,
-    show_text:  '--textbox'     , ask:        '--inputbox',
-    ask_pass:   '--passwordbox' , ask_yesno:  '--yesno'   ,
-    check:      '--checklist'   , menu:       '--menu'    ,
-    radio:      '--radiolist'   , gauge:      '--gauge'   ,
+    show_info:  '--infobox'     , show_msg:   '--msgbox'    ,
+    show_text:  '--textbox'     , ask:        '--inputbox'  ,
+    ask_pass:   '--passwordbox' , ask_yesno:  '--yesno'     ,
+    menu:       '--menu'        , check:      '--checklist' ,
+    radio:      '--radiolist'   , gauge:      '--gauge'     ,
   }                                                             # }}}1
 
   OPTS = {                                                      # {{{1
@@ -57,9 +66,6 @@ module Eft
     },
   }                                                             # }}}1
 
-  OPT = ->(o,x) { o.select { |k,v| OPTS[x][k] }
-                      .map { |k,v| OPTS[x][k][v] } }
-
   # --
 
   class Error < RuntimeError; end
@@ -71,6 +77,7 @@ module Eft
     def call(k, *a)
       @cfg[k][*a] if @cfg[k]
     end
+    def _opts; [] end
   end                                                           # }}}1
 
   # --
@@ -89,8 +96,6 @@ module Eft
   class CfgAsk        < Cfg; include CfgEsc, CfgOK, CfgCancel ; end
   class CfgAskPass    < Cfg; include CfgEsc, CfgOK, CfgCancel ; end
   class CfgAskYesNo   < Cfg; include CfgEsc, CfgYes, CfgNo    ; end
-  class CfgCheck      < Cfg; include CfgEsc, CfgOK, CfgCancel ; end
-  class CfgRadio      < Cfg; include CfgEsc, CfgOK, CfgCancel ; end
   class CfgGauge      < Cfg                                   ; end
 
   # --
@@ -104,6 +109,29 @@ module Eft
       @menu << { tag: tag, item: item, block: b }
     end
     def _menu; @menu end
+  end                                                           # }}}1
+
+  class CfgCheck < Cfg                                          # {{{1
+    include CfgEsc, CfgOK, CfgCancel
+    def initialize(*a, &b)
+      @check = []; super; @check.freeze
+    end
+    def choice(tag, item, selected = false)
+      @check << { tag: tag, item: item, selected: selected }
+    end
+    def _check; @check end
+    def _opts; CHECK_OPTS; end
+  end                                                           # }}}1
+
+  class CfgRadio < Cfg                                          # {{{1
+    include CfgEsc, CfgOK, CfgCancel
+    def initialize(*a, &b)
+      @radio = []; super; @radio.freeze
+    end
+    def choice(tag, item)
+      @radio << { tag: tag, item: item }
+    end
+    def _radio; @radio end
   end                                                           # }}}1
 
   # --
@@ -153,13 +181,6 @@ module Eft
 
   # --
 
-  # choose checkboxes
-  def self.check(text, opts = {}, &b)
-    :TODO
-  end
-  # --checklist text height width list-height [ tag item status ] ...
-  # --separate-output
-
   # choose from menu w/ OK/Cancel buttons
   def self.menu(text, opts = {}, &b)                            # {{{1
     c = CfgMenu.new(&b); m = c._menu
@@ -170,13 +191,29 @@ module Eft
       tag = lines.first; t[tag][:block][tag]
     end
   end                                                           # }}}1
-  # --noitem
 
-  # choose radiobox
-  def self.radio(text, opts = {}, &b)
-    :TODO
+  # --
+
+  # choose checkboxes w/ OK/Cancel buttons
+  def self.check(text, opts = {}, &b)                           # {{{1
+    c = CfgCheck.new(&b); i = c._check
+    o = opts.merge(subheight: opts[:list_height]).freeze
+    a = i.map { |x| [x[:tag],x[:item],ON_OFF[x[:selected]]] } .flatten
+    _whip(:check, text, c, o, a) do |lines|
+      c.call :on_ok, lines
+    end
+  end                                                           # }}}1
+
+  # choose radiobutton w/ OK/Cancel buttons
+  def self.radio(text, opts = {}, &b)                           # {{{1
+    s = opts[:selected] ; f = ->(x) { ON_OFF[x == s] }
+    c = CfgRadio.new(&b); i = c._radio
+    o = opts.merge(subheight: opts[:list_height]).freeze
+    a = i.map { |x| [x[:tag],x[:item],f[x[:tag]]] } .flatten
+    _whip(:radio, text, c, o, a) do |lines|
+      c.call :on_ok, lines.first
+    end                                                         # }}}1
   end
-  # --radiolist text height width list-height [ tag item status ] ...
 
   # --
 
@@ -202,7 +239,7 @@ module Eft
     o = _whip_opts what, cfg, opts; c = _whip_cmd text, opts, o, args
     r = _run_whip c
     case r[:exit]
-    when EXIT[:ok_yes]    ; b[r[:lines]]
+    when EXIT[:ok_yes]    ; b[r[:lines]] if b
     when EXIT[:cancel_no] ; cfg.call :on_cancel; cfg.call :on_no
     when EXIT[:esc]       ; cfg.call :on_esc
     else                    raise Error, 'unknown exitstatus'
@@ -212,13 +249,13 @@ module Eft
 
   # process whiptail options
   def self._whip_opts(what, cfg, opts)                          # {{{1
-     [WHAT[what]] + [               OPT[opts,:all],
+     cfg._opts + [                  OPT[opts,:all],
       cfg.respond_to?(:on_ok)     ? OPT[opts,:ok]     : [],
       cfg.respond_to?(:on_cancel) ? OPT[opts,:cancel] : [],
       cfg.respond_to?(:on_yes)    ? OPT[opts,:yes]    : [],
       cfg.respond_to?(:on_no)     ? OPT[opts,:no]     : [],
       what == :menu               ? OPT[opts,:menu]   : [],
-    ] .flatten
+    ] .flatten + [WHAT[what]]
   end                                                           # }}}1
 
   # whiptail command
