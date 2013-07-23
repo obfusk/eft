@@ -165,12 +165,12 @@ module Eft
   # passing it percent, message
   def self.gauge(text, percent, opts = {}, &b)                  # {{{1
     IO.pipe do |r, w|
-      move  = ->(pct, msg) { w.puts pct, 'XXX', pct, msg, 'XXX' }
-      c     = CfgGauge.new
-      o     = _whip_opts :gauge, c, opts
-      c     = _whip_cmd text, c, o, [percent]
-      pid   = OU.spawn *c, in: r
-      r.close; b[move]; Process.wait pid
+      mv  = ->(pct, msg) { w.puts 'XXX', pct, msg, 'XXX', pct } # WTF!
+      c   = CfgGauge.new
+      o   = _whip_opts :gauge, c, opts
+      c   = _whip_cmd text, opts, o, [percent]
+      pid = OU.spawn *c, in: r
+      r.close; b[mv]; w.close; Process.wait pid
       raise Error, 'exitstatus != 0' if $?.exitstatus != 0
     end                                                         # }}}1
   end
@@ -180,7 +180,7 @@ module Eft
   # process options, run whiptail, call b[lines]/on_{cancel,no,esc}[]
   # @raise Error if unknown exitstatus
   def self._whip(what, text, cfg, opts, args = [], &b)          # {{{1
-    o = _whip_opts what, cfg, opts; c = _whip_cmd text, cfg, o, args
+    o = _whip_opts what, cfg, opts; c = _whip_cmd text, opts, o, args
     r = _run_whip c
     case r[:exit]
     when EXIT[:ok_yes]    ; b[r[:lines]]
@@ -194,20 +194,20 @@ module Eft
   # process whiptail options
   def self._whip_opts(what, cfg, opts)                          # {{{1
      [WHAT[what]] + [               OPT[opts,:all],
-      cfg.repond_to?(:on_ok)      ? OPT[opts,:ok]     : [],
-      cfg.repond_to?(:on_cancel)  ? OPT[opts,:cancel] : [],
-      cfg.repond_to?(:on_yes)     ? OPT[opts,:yes]    : [],
-      cfg.repond_to?(:on_no)      ? OPT[opts,:no]     : [],
+      cfg.respond_to?(:on_ok)     ? OPT[opts,:ok]     : [],
+      cfg.respond_to?(:on_cancel) ? OPT[opts,:cancel] : [],
+      cfg.respond_to?(:on_yes)    ? OPT[opts,:yes]    : [],
+      cfg.respond_to?(:on_no)     ? OPT[opts,:no]     : [],
       what == :menu               ? OPT[opts,:menu]   : [],
     ] .flatten
   end                                                           # }}}1
 
   # whiptail command
-  def self._whip_cmd(text, cfg, opts, args)
-    h = cfg[:height] || OU::Term.lines   - 4
-    w = cfg[:width]  || OU::Term.columns - 4
-    s = cfg.has_key?(:subheight) ? [cfg[:subheight] || h - 8] : []
-    ([WHIPTAIL] + opts + ['--', text, h, w] + s + args).map &:to_s
+  def self._whip_cmd(text, opts, opt_args, args)
+    h = opts[:height] || OU::Term.lines   - 4
+    w = opts[:width]  || OU::Term.columns - 4
+    s = opts.has_key?(:subheight) ? [opts[:subheight] || h - 8] : []
+    ([WHIPTAIL] + opt_args + ['--', text, h, w] + s + args).map &:to_s
   end
 
   # run whiptail; return { exit: exitstatus, lines: chomped_lines }
