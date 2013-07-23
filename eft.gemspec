@@ -20,6 +20,8 @@ Gem::Specification.new do |s|
   s.files       = %w{ README.md eft.gemspec }\
                 + Dir['lib/**/*.rb']
 
+  s.add_runtime_dependency 'obfusk-util'
+
   # s.add_development_dependency  'rake'
   # s.add_development_dependency  'rspec'
 
