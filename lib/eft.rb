@@ -10,6 +10,7 @@
 # --                                                            ; }}}1
 
 require 'obfusk/util/run'
+require 'obfusk/util/term'
 
 module Eft
 
@@ -43,6 +44,10 @@ module Eft
   OU = Obfusk::Util
 
   # --
+
+  WHIPTAIL = 'whiptail'
+
+  EXIT = { 0 => [:ok, :yes], 1 => [:cancel, :no], 255 => [:esc] }
 
   OPTS = {                                                      # {{{1
     all: {
@@ -193,17 +198,20 @@ module Eft
 
   # --
 
-  def self.
+  def self._whip(what, cfg, opts, args)
 
-  def self._whip(opts, what, args)                              # {{{1
-    a = # ...
-    r = nil
-    OU.popen3(*a) do |inp,out,err,thr|
-      OU.chk_exitstatus a, thr.value.exitstatus
-      puts "Exit: #{thr.value.exitstatus}"
-      r = err.readlines.map { |x| x.chomp }
+  end
+
+  # run whiptail; return { exit: exitstatus, err: chomped_lines }
+  def self._run_whip(text, cfg, opts, args)                     # {{{1
+    h = cfg[:height] || OU::Term.lines   - 4
+    w = cfg[:width]  || OU::Term.columns - 4
+    s = cfg.has_key?(:subheight) ? [cfg[:subheight] || h - 8] : []
+    a = ([WHIPTAIL] + opts + ['--', text, h, w] + s + args).map &:to_s
+    IO.pipe do |r, w|
+      s = OU.spawn_w *a, err: w; w.close
+      { exit: s.exitstatus, err: r.readlines.map { |x| x.chomp } }
     end
-    r
   end                                                           # }}}1
 
 end
