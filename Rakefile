@@ -18,6 +18,11 @@ task :warn do
   sh 'ruby -w -I lib -I ../rb-obfusk-util/lib -r eft -e ""'
 end
 
+desc 'Run example'
+task :example do
+  sh 'ruby -w -I lib -I ../rb-obfusk-util/lib example.rb'
+end
+
 desc 'Generate docs'
 task :docs do
   sh 'yardoc | cat'
