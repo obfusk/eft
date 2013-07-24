@@ -227,7 +227,7 @@ module Eft
       c   = CfgGauge.new
       o   = _whip_opts :gauge, c, opts
       c   = _whip_cmd text, opts, o, [percent]
-      pid = OU.spawn *c, in: r
+      pid = OU.spawn(*c, in: r)
       r.close; b[mv]; w.close; Process.wait pid
       raise Error, 'exitstatus != 0' if $?.exitstatus != 0
     end                                                         # }}}1
@@ -261,17 +261,18 @@ module Eft
   end                                                           # }}}1
 
   # whiptail command
-  def self._whip_cmd(text, opts, opt_args, args)
+  def self._whip_cmd(text, opts, opt_args, args)                # {{{1
     h = opts[:height] || OU::Term.lines   - 4
     w = opts[:width]  || OU::Term.columns - 4
     s = opts.has_key?(:subheight) ? [opts[:subheight] || h - 8] : []
-    ([WHIPTAIL] + opt_args + ['--', text, h, w] + s + args).map &:to_s
-  end
+    a = [WHIPTAIL] + opt_args + ['--', text, h, w] + s + args
+    a.map(&:to_s)
+  end                                                           # }}}1
 
   # run whiptail; return { exit: exitstatus, lines: chomped_lines }
   def self._run_whip(args)
     IO.pipe do |r, w|
-      s = OU.spawn_w *args, err: w; w.close
+      s = OU.spawn_w(*args, err: w); w.close
       { exit: s.exitstatus, lines: r.readlines.map(&:chomp) }
     end
   end
