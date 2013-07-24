@@ -22,7 +22,10 @@ Eft.menu('Choices:', selected: 'bar', title: 'Menu',
   end
   m.on('baz', 'Baz!?') do |x|
     Eft.gauge '...', 0, title: 'Progress' do |mv|
-      0.upto(100) { |i| mv[i, "We're at ##{i} ..."]; sleep 0.05 }
+      0.upto(100) do |i|
+        i % 5 == 0 ? mv[i, "We're at ##{i} ..."] : mv[i]
+        sleep 0.05
+      end
     end
   end
   m.on('qux', 'Quixotic?') do |x|

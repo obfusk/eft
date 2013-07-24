@@ -2,7 +2,7 @@
 #
 # File        : eft.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-24
+# Date        : 2013-07-25
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -218,10 +218,12 @@ module Eft
   # --
 
   # show gauge; use lambda passed to block to move it forward by
-  # passing it percent, message
+  # passing it percent[, message]
   def self.gauge(text, percent, opts = {}, &b)                  # {{{1
     IO.pipe do |r, w|
-      mv  = ->(pct, msg) { w.puts 'XXX', pct, msg, 'XXX', pct } # WTF!
+      mv  = ->(pct, msg = nil) {
+        msg ? w.puts('XXX', pct, msg, 'XXX', pct) : w.puts(pct) # WTF!
+      }
       c   = CfgGauge.new
       o   = _whip_opts :gauge, c, opts
       c   = _whip_cmd text, opts, o, [percent]

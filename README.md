@@ -2,7 +2,7 @@
 
     File        : README.md
     Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-    Date        : 2013-07-23
+    Date        : 2013-07-25
 
     Copyright   : Copyright (C) 2013  Felix C. Stegerman
     Version     : v0.2.0.dev
@@ -27,6 +27,7 @@ end
 
 ## TODO
 
+  * specs! (how?!)
   * --noitem?
   * choose between whiptail and dialog?
   * extend w/ dialog's other dialogs?
