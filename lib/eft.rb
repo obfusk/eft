@@ -2,7 +2,7 @@
 #
 # File        : eft.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-23
+# Date        : 2013-07-24
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -270,7 +270,7 @@ module Eft
   def self._run_whip(args)
     IO.pipe do |r, w|
       s = OU.spawn_w *args, err: w; w.close
-      { exit: s.exitstatus, lines: r.readlines.map { |x| x.chomp } }
+      { exit: s.exitstatus, lines: r.readlines.map(&:chomp) }
     end
   end
 
