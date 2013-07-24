@@ -33,6 +33,7 @@ module Eft
 
   # --
 
+  # translate method to option
   WHAT = {                                                      # {{{1
     show_info:  '--infobox'     , show_msg:   '--msgbox'    ,
     show_text:  '--textbox'     , ask:        '--inputbox'  ,
@@ -41,6 +42,7 @@ module Eft
     radio:      '--radiolist'   , gauge:      '--gauge'     ,
   }                                                             # }}}1
 
+  # options per category
   OPTS = {                                                      # {{{1
     all: {
       title:          ->(t) { ['--title', t] },
@@ -70,17 +72,23 @@ module Eft
 
   class Error < RuntimeError; end
 
+  # configuration class
   class Cfg                                                     # {{{1
+    # set from hash, pass to block, freeze
     def initialize(cfg = {}, &b)
       @cfg = cfg; b[self] if b; @cfg.freeze
     end
+
+    # call if set
     def call(k, *a)
       @cfg[k][*a] if @cfg[k]
     end
+
+    # nothing by default
     def _opts; [] end
   end                                                           # }}}1
 
-  # --
+  #
 
   module CfgEsc   ; def on_esc(&b)    @cfg[:on_esc]     = b end; end
   module CfgOK    ; def on_ok(&b)     @cfg[:on_ok]      = b end; end
@@ -88,7 +96,7 @@ module Eft
   module CfgYes   ; def on_yes(&b)    @cfg[:on_yes]     = b end; end
   module CfgNo    ; def on_no(&b)     @cfg[:on_no]      = b end; end
 
-  # --
+  #
 
   class CfgShowInfo   < Cfg                                   ; end
   class CfgShowMsg    < Cfg; include CfgEsc, CfgOK            ; end
@@ -98,39 +106,54 @@ module Eft
   class CfgAskYesNo   < Cfg; include CfgEsc, CfgYes, CfgNo    ; end
   class CfgGauge      < Cfg                                   ; end
 
-  # --
+  #
 
+  # menu config
   class CfgMenu < Cfg                                           # {{{1
     include CfgEsc, CfgOK, CfgCancel
+
     def initialize(*a, &b)
       @menu = []; super; @menu.freeze
     end
+
+    # add menu item
     def on(tag, item, &b)
       @menu << { tag: tag, item: item, block: b }
     end
+
     def _menu; @menu end
   end                                                           # }}}1
 
+  # checkboxes config
   class CfgCheck < Cfg                                          # {{{1
     include CfgEsc, CfgOK, CfgCancel
+
     def initialize(*a, &b)
       @check = []; super; @check.freeze
     end
+
+    # add a choice
     def choice(tag, item, selected = false)
       @check << { tag: tag, item: item, selected: selected }
     end
+
     def _check; @check end
     def _opts; CHECK_OPTS; end
   end                                                           # }}}1
 
+  # radiolist config
   class CfgRadio < Cfg                                          # {{{1
     include CfgEsc, CfgOK, CfgCancel
+
     def initialize(*a, &b)
       @radio = []; super; @radio.freeze
     end
+
+    # add a choice
     def choice(tag, item)
       @radio << { tag: tag, item: item }
     end
+
     def _radio; @radio end
   end                                                           # }}}1
 
@@ -218,7 +241,7 @@ module Eft
   # --
 
   # show gauge; use lambda passed to block to move it forward by
-  # passing it percent[, message]
+  # passing it `percent[, message]`
   def self.gauge(text, percent, opts = {}, &b)                  # {{{1
     IO.pipe do |r, w|
       mv  = ->(pct, msg = nil) {
@@ -235,7 +258,8 @@ module Eft
 
   # --
 
-  # process options, run whiptail, call b[lines]/on_{cancel,no,esc}[]
+  # process options, run whiptail, call `b[lines]` or
+  # `on_{cancel,no,esc}[]`
   # @raise Error if unknown exitstatus
   def self._whip(what, text, cfg, opts, args = [], &b)          # {{{1
     o = _whip_opts what, cfg, opts; c = _whip_cmd text, opts, o, args
@@ -269,7 +293,8 @@ module Eft
     a.map(&:to_s)
   end                                                           # }}}1
 
-  # run whiptail; return { exit: exitstatus, lines: chomped_lines }
+  # run whiptail
+  # @return [Hash] `{ exit: exitstatus, lines: chomped_lines }`
   def self._run_whip(args)
     IO.pipe do |r, w|
       s = OU.spawn_w(*args, err: w); w.close
@@ -279,8 +304,8 @@ module Eft
 
   # --
 
-  # call block w/ either opts[:file] or a tempfile w/ contents
-  # opts[:text]
+  # call block w/ either `opts[:file]` or a tempfile w/ contents
+  # `opts[:text]`
   def self._file_or_temp(opts, &b)                              # {{{1
     file = opts[:file]; text = opts[:text]
     raise Error, 'can\'t have file and text' if file && text
