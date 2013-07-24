@@ -2,6 +2,5 @@
 *.swp
 
 /*.gem
-/*.tar
-/_archive
-/_tmp
+/.yardoc
+/doc
