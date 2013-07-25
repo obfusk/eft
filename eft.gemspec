@@ -6,6 +6,8 @@ Gem::Specification.new do |s|
   s.summary     = 'ruby + whiptail'
 
   s.description = <<-END.gsub(/^ {4}/, '')
+    ruby + whiptail
+
     ...
   END
 
@@ -17,13 +19,14 @@ Gem::Specification.new do |s|
 
   s.license     = 'GPLv2'
 
-  s.files       = %w{ README.md eft.gemspec }\
+  s.files       = %w{ .yardopts README.md Rakefile } \
+                + %w{ eft.gemspec example.rb } \
                 + Dir['lib/**/*.rb']
 
   s.add_runtime_dependency 'obfusk-util'
 
-  # s.add_development_dependency  'rake'
-  # s.add_development_dependency  'rspec'
+  s.add_development_dependency 'rake'
+# s.add_development_dependency 'rspec'
 
   s.required_ruby_version = '>= 1.9.1'
 end

@@ -1,16 +1,19 @@
 desc 'Run specs'
 task :spec do
-  sh 'rspec -c'
+  puts 'No automated tests yet - please manually test the example'
+  # sh 'rspec -c'
 end
 
 desc 'Run specs verbosely'
 task 'spec:verbose' do
-  sh 'rspec -cfd'
+  puts 'No automated tests yet - please manually test the example'
+  # sh 'rspec -cfd'
 end
 
 desc 'Run specs verbosely, view w/ less'
 task 'spec:less' do
-  sh 'rspec -cfd --tty | less -R'
+  puts 'No automated tests yet - please manually test the example'
+  # sh 'rspec -cfd --tty | less -R'
 end
 
 desc 'Check for warnings'

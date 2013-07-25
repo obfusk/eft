@@ -5,7 +5,7 @@
     Date        : 2013-07-25
 
     Copyright   : Copyright (C) 2013  Felix C. Stegerman
-    Version     : v0.2.0.dev
+    Version     : v0.2.0.SNAPSHOT
 
 []: }}}1
 
@@ -25,12 +25,21 @@ end
 
 []: }}}1
 
+## Specs & Docs
+[]: {{{1
+
+    $ rake spec   # doesn't work yet; see TODO
+    $ rake docs
+
+[]: }}}1
+
 ## TODO
 
-  * specs! (how?!)
+  * specs! (how to automate tests of whiptail? - I don't know!)
   * --noitem?
   * choose between whiptail and dialog?
   * extend w/ dialog's other dialogs?
+  * remove dependency on obfusk-util?
 
 ## License
 []: {{{1
