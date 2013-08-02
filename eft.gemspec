@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.authors     = [ 'Felix C. Stegerman' ]
   s.email       = %w{ flx@obfusk.net }
 
-  s.license     = 'GPLv2'
+  s.licenses    = %w{ GPLv2 EPLv1 }
 
   s.files       = %w{ .yardopts README.md Rakefile } \
                 + %w{ eft.gemspec example.rb } \
