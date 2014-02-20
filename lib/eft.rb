@@ -9,7 +9,7 @@
 #
 # --                                                            ; }}}1
 
-require 'tempfile'
+require 'tmpdir'
 
 require 'obfusk/util/run'
 require 'obfusk/util/term'
@@ -313,7 +313,11 @@ module Eft
     if file
       b[file]
     else
-      Tempfile.open('eft') { |f| f.write text; f.close; b[f.path] }
+      Dir.mktmpdir do |dir|
+        open("#{dir}/eft", 'w') do |f|
+          f.write text; f.close; b[f.path]
+        end
+      end
     end
   end                                                           # }}}1
 

@@ -6,8 +6,6 @@ Gem::Specification.new do |s|
   s.summary     = 'ruby + whiptail'
 
   s.description = <<-END.gsub(/^ {4}/, '')
-    ruby + whiptail
-
     Eft is a ruby dsl that wraps whiptail to display dialog boxes.
   END
 
