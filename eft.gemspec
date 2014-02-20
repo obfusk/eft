@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.description = <<-END.gsub(/^ {4}/, '')
     ruby + whiptail
 
-    ...
+    Eft is a ruby dsl that wraps whiptail to display dialog boxes.
   END
 
   s.version     = Eft::VERSION
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.authors     = [ 'Felix C. Stegerman' ]
   s.email       = %w{ flx@obfusk.net }
 
-  s.licenses    = %w{ GPLv2 EPLv1 }
+  s.licenses    = %w{ LGPLv3+ }
 
   s.files       = %w{ .yardopts README.md Rakefile } \
                 + %w{ eft.gemspec example.rb } \

@@ -1,4 +1,4 @@
 module Eft
-  VERSION = '0.2.0.SNAPSHOT'
-  DATE    = '2013-07-25'
+  VERSION = '0.4.0'
+  DATE    = '2014-02-20'
 end

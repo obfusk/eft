@@ -2,20 +2,22 @@
 
     File        : README.md
     Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-    Date        : 2013-08-02
+    Date        : 2014-02-20
 
-    Copyright   : Copyright (C) 2013  Felix C. Stegerman
-    Version     : v0.2.0.SNAPSHOT
+    Copyright   : Copyright (C) 2014  Felix C. Stegerman
+    Version     : v0.4.0
 
 []: }}}1
+
+[![Gem Version](https://badge.fury.io/rb/eft.png)](http://badge.fury.io/rb/eft)
 
 ## Description
 []: {{{1
 
   eft - ruby + whiptail
 
-  Eft is a ruby dsl that wraps whiptail [1] to display dialog boxes;
-  see example.rb for usage examples.
+  Eft is a ruby dsl that wraps `whiptail` [1] to display dialog boxes;
+  see `example.rb` for examples.
 
 ```ruby
 Eft.ask('What is your name?') do |q|
@@ -26,12 +28,11 @@ end
 []: }}}1
 
 ## Specs & Docs
-[]: {{{1
 
-    $ rake spec   # doesn't work yet; see TODO
-    $ rake docs
-
-[]: }}}1
+```bash
+$ rake spec   # TODO
+$ rake docs
+```
 
 ## TODO
 
@@ -42,24 +43,15 @@ end
   * remove dependency on obfusk-util?
 
 ## License
-[]: {{{1
 
-  GPLv2 [2] or EPLv1 [3].
-
-[]: }}}1
+  LGPLv3+ [2].
 
 ## References
-[]: {{{1
 
   [1] Newt (and whiptail)
   --- http://en.wikipedia.org/wiki/Newt_(programming_library)
 
-  [2] GNU General Public License, version 2
-  --- http://www.opensource.org/licenses/GPL-2.0
-
-  [3] Eclipse Public License, version 1
-  --- http://www.opensource.org/licenses/EPL-1.0
-
-[]: }}}1
+  [2] GNU Lesser General Public License, version 3
+  --- http://www.gnu.org/licenses/lgpl-3.0.html
 
 []: ! ( vim: set tw=70 sw=2 sts=2 et fdm=marker : )
