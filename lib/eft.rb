@@ -27,7 +27,7 @@ module Eft
   EXIT        = { ok_yes: 0, cancel_no: 1, esc: 255 }
   CHECK_OPTS  = ['--separate-output']
 
-  OPT         = ->(o,x) { o.select { |k,v| OPTS[x][k] }
+  OPT         = ->(o,x) { o.select { |k,v| v && OPTS[x][k] }
                               .map { |k,v| OPTS[x][k][v] } }
   ON_OFF      = ->(x) { x ? 'on' : 'off' }
 
